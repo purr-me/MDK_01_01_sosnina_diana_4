@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Chess_Sosnina.Classes;
 
 namespace Chess_Sosnina
 {
@@ -20,12 +21,21 @@ namespace Chess_Sosnina
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<Pawn> Pawns = new List<Pawn>();
+        public static MainWindow init;
+
         public MainWindow()
         {
             InitializeComponent();
+            init = this;
         }
 
         private void SelectTile(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        public void OnSelect(Pawn pawn)
         {
 
         }
