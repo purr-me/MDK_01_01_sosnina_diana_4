@@ -21,8 +21,11 @@ namespace Chess_Sosnina
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<King> Kings = new List<King>();
+
         public List<Pawn> Pawns = new List<Pawn>();
         public static MainWindow init;
+
 
 
         public MainWindow()
@@ -35,6 +38,9 @@ namespace Chess_Sosnina
                 Pawns.Add(new Pawn(i, 1, false));
                 Pawns.Add(new Pawn(i, 6, true));
             }
+
+            Kings.Add(new King(4, 0, false)); 
+            Kings.Add(new King(4, 7, true));
 
             CreateFigures();
         }
@@ -58,6 +64,25 @@ namespace Chess_Sosnina
                 Pawn.Figure.MouseDown += Pawn.SelectFigure;
                 gameBoard.Children.Add(Pawn.Figure);
             }
+
+            foreach (King king in Kings)
+            {
+                king.Figure = new Grid()
+                {
+                    Width = 50,
+                    Height = 50
+                };
+
+                if (king.Black)
+                    king.Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/King (black).png")));
+                else
+                    king.Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/King.png")));
+
+                Grid.SetColumn(king.Figure, king.X);
+                Grid.SetRow(king.Figure, king.Y);
+                king.Figure.MouseDown += king.SelectFigure;
+                gameBoard.Children.Add(king.Figure);
+            }
         }
 
         private void SelectTile(object sender, MouseButtonEventArgs e)
@@ -67,19 +92,62 @@ namespace Chess_Sosnina
             int Y = Grid.GetRow(Tile);
 
             Pawn SelectPawn = Pawns.Find(x => x.Select == true);
-            if(SelectPawn != null)
+
+
+
+            //ищем выдел. короля
+            King SelectKing = Kings.Find(x => x.Select == true);
+
+
+
+            if (SelectPawn != null)
             {
                 SelectPawn.Transform(X, Y);
             }
+
+
+            //если выбран двигаем 
+            else if (SelectKing != null)
+            {
+                SelectKing.Transform(X, Y);
+            }
+
+
         }
 
         public void OnSelect(Pawn pawn)
         {
-            foreach (Pawn Pawn in Pawns)
+            //убираем выделение с др пешек
+            foreach (Pawn currentPawn in Pawns)
             {
-                if (Pawn != pawn)
-                    if(Pawn.Select)
-                        Pawn.SelectFigure(null, null); 
+                if (currentPawn != pawn && currentPawn.Select)
+                    currentPawn.SelectFigure(null, null);
+            }
+
+            //убираем выделение с королей
+            foreach (King currentKing in Kings)
+            {
+                // Тут мы сравниваем через object, чтобы не было ошибки типов
+                if ((object)currentKing != (object)pawn && currentKing.Select)
+                    currentKing.SelectFigure(null, null);
+            }
+        }
+
+        //при выбранном короле
+        public void OnSelectKing(King king)
+        {
+            //убираем выделение с пешек
+            foreach (Pawn currentPawn in Pawns)
+            {
+                if ((object)currentPawn != (object)king && currentPawn.Select)
+                    currentPawn.SelectFigure(null, null);
+            }
+
+            //убираем выделение с др королей
+            foreach (King currentKing in Kings)
+            {
+                if (currentKing != king && currentKing.Select)
+                    currentKing.SelectFigure(null, null);
             }
         }
     }

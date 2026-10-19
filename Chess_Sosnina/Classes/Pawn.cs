@@ -26,6 +26,34 @@ namespace Chess_Sosnina.Classes
 
         public void SelectFigure(object sender, MouseButtonEventArgs e)
         {
+            //проверка выбранного короля
+            King selectedKing = MainWindow.init.Kings.Find(k => k.Select == true);
+            if (selectedKing != null && selectedKing.Black != this.Black)
+            {
+                //если выбран и он вражеский
+                int deltaX = Math.Abs(selectedKing.X - this.X);
+                int deltaY = Math.Abs(selectedKing.Y - this.Y);
+
+                //если стоит рядом то рубит пешку
+                if (deltaX <= 1 && deltaY <= 1 && (deltaX + deltaY) > 0)
+                {
+                    //убираем пешку
+                    MainWindow.init.gameBoard.Children.Remove(this.Figure);
+                    MainWindow.init.Pawns.Remove(this);
+
+                    //занмаем место пешки
+                    Grid.SetColumn(selectedKing.Figure, this.X);
+                    Grid.SetRow(selectedKing.Figure, this.Y);
+                    selectedKing.X = this.X;
+                    selectedKing.Y = this.Y;
+
+                    selectedKing.SelectFigure(null, null);
+                    return; 
+                }
+            }
+
+
+
             Pawn SelectPawn = MainWindow.init.Pawns.Find(x => x.Select == true);
             if (SelectPawn != null)
             {
