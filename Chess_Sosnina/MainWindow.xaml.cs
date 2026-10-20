@@ -87,6 +87,10 @@ namespace Chess_Sosnina
 
         private void SelectTile(object sender, MouseButtonEventArgs e)
         {
+            ClearHighlights();
+
+
+
             Grid Tile = sender as Grid;
             int X = Grid.GetColumn(Tile);
             int Y = Grid.GetRow(Tile);
@@ -148,6 +152,55 @@ namespace Chess_Sosnina
             {
                 if (currentKing != king && currentKing.Select)
                     currentKing.SelectFigure(null, null);
+            }
+        }
+
+
+
+
+
+
+
+        //сброс подсветки
+        public void ClearHighlights()
+        {
+            foreach (var item in gameBoard.Children)
+            {
+                if (item is Grid cell)
+                {
+                    //клетка доски
+                    if (cell.Background is SolidColorBrush)
+                    {
+                        int x = Grid.GetColumn(cell);
+                        int y = Grid.GetRow(cell);
+
+                        //возвращаем цвет
+                        if ((x + y) % 2 == 0)
+                            cell.Background = Brushes.White;
+                        else
+                            cell.Background = (Brush)new BrushConverter().ConvertFrom("#FF9A6400");
+                    }
+                }
+            }
+        }
+
+        //закрашивание одной клетки
+        public void HighlightTile(int x, int y, Brush color)
+        {
+            foreach (var item in gameBoard.Children)
+            {
+                if (item is Grid cell)
+                {
+                    //только клетки доски
+                    if (cell.Background is SolidColorBrush)
+                    {
+                        if (Grid.GetColumn(cell) == x && Grid.GetRow(cell) == y)
+                        {
+                            cell.Background = color;
+                            return;
+                        }
+                    }
+                }
             }
         }
     }

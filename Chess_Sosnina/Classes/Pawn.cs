@@ -80,11 +80,17 @@ namespace Chess_Sosnina.Classes
                 else
                     Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/Pawn.png")));
                 Select = false;
+
+
+                MainWindow.init.ClearHighlights();
             }
             else
             {
                 Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/Pawn (select).png")));
                 Select = true;
+
+
+                ShowHighlights();
             }
         }
     
@@ -110,6 +116,58 @@ namespace Chess_Sosnina.Classes
             }
             SelectFigure(null, null);
         }
-    
+
+
+
+
+
+
+        public void ShowHighlights()
+        {
+            MainWindow.init.ClearHighlights();
+            int dir = this.Black ? -1 : 1; //черные вверх (-1) белые вниз (+1)
+            int nextY = this.Y + dir;
+
+            //шаг вперед если пусто
+            if (nextY >= 0 && nextY < 8)
+            {
+                Pawn p1 = MainWindow.init.Pawns.Find(p => p.X == this.X && p.Y == nextY);
+                King k1 = MainWindow.init.Kings.Find(k => k.X == this.X && k.Y == nextY);
+
+                if (p1 == null && k1 == null) //путсая клетка
+                {
+                    MainWindow.init.HighlightTile(this.X, nextY, Brushes.LightGreen);
+
+                    //первый ход (2 клетки)
+                    if ((this.Black && this.Y == 6) || (!this.Black && this.Y == 1))
+                    {
+                        int nextY2 = this.Y + (dir * 2);
+                        Pawn p2 = MainWindow.init.Pawns.Find(p => p.X == this.X && p.Y == nextY2);
+                        King k2 = MainWindow.init.Kings.Find(k => k.X == this.X && k.Y == nextY2);
+
+                        if (p2 == null && k2 == null)
+                            MainWindow.init.HighlightTile(this.X, nextY2, Brushes.LightGreen);
+                    }
+                }
+            }
+
+            //атака по диагонали если есть враг
+            int[] dxs = { -1, 1 };
+            foreach (int dx in dxs)
+            {
+                int attackX = this.X + dx;
+                if (attackX >= 0 && attackX < 8 && nextY >= 0 && nextY < 8)
+                {
+                    Pawn enemyPawn = MainWindow.init.Pawns.Find(p => p.X == attackX && p.Y == nextY && p.Black != this.Black);
+                    King enemyKing = MainWindow.init.Kings.Find(k => k.X == attackX && k.Y == nextY && k.Black != this.Black);
+
+                    if (enemyPawn != null || enemyKing != null)
+                        MainWindow.init.HighlightTile(attackX, nextY, Brushes.LightCoral);
+                }
+            }
+        }
+
+
+
     }
 }

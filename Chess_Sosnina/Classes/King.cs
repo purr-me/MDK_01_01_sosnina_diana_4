@@ -15,10 +15,9 @@ namespace Chess_Sosnina.Classes
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public bool Select { get; set; } = false;
-        public bool Black { get; set; } = false;
+        public bool Select = false;
+        public bool Black = false;
         public Grid Figure { get; set; }
-        public Grid CurrentTile { get; set; }
 
         public King(int X, int Y, bool Black)
         {
@@ -30,9 +29,6 @@ namespace Chess_Sosnina.Classes
 
         public void SelectFigure(object sender, MouseButtonEventArgs e)
         {
-            
-
-
             MainWindow.init.OnSelectKing(this);
 
             //выбран - снимаем выделение
@@ -44,6 +40,9 @@ namespace Chess_Sosnina.Classes
                     this.Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/King.png")));
 
                 this.Select = false;
+
+
+                MainWindow.init.ClearHighlights();
             }
             //не выбран - выделяем
             else
@@ -51,6 +50,9 @@ namespace Chess_Sosnina.Classes
                 this.Figure.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/Images/King (select).png")));
 
                 this.Select = true;
+
+
+                ShowHighlights();
             }
         }
 
@@ -93,7 +95,42 @@ namespace Chess_Sosnina.Classes
             }
 
             SelectFigure(null, null);
-
         }
+
+
+
+
+
+        public void ShowHighlights()
+        {
+            MainWindow.init.ClearHighlights(); //чистим
+
+            //8 клеток вокруг
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx == 0 && dy == 0) continue; //под собой скип
+
+                    int newX = this.X + dx;
+                    int newY = this.Y + dy;
+
+                    //в пределах доски
+                    if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
+                    {
+                        //ищем врага на этой клетке
+                        Pawn enemyPawn = MainWindow.init.Pawns.Find(p => p.X == newX && p.Y == newY && p.Black != this.Black);
+                        King enemyKing = MainWindow.init.Kings.Find(k => k.X == newX && k.Y == newY && k.Black != this.Black);
+
+                        if (enemyPawn != null || enemyKing != null)
+                            MainWindow.init.HighlightTile(newX, newY, Brushes.LightCoral); //красный
+                        else
+                            MainWindow.init.HighlightTile(newX, newY, Brushes.LightGreen); //зеленый
+                    }
+                }
+            }
+        }
+
+
     }
 }
